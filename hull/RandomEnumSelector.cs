@@ -8,8 +8,21 @@ public abstract class RandomEnumSelector
     private static Random _random = new();
     public static List<GameEvents> GetRandomGameEvents()
     {
-        var gameEvents = GetWeightedRandomGameEvents(ConfigManager.GetWeights(), 3);
-        return gameEvents;
+        var weights = ConfigManager.GetWeights();
+        var gameEvents = new HashSet<GameEvents>();
+
+        foreach (var weight in weights)
+        {
+            for (int i = 0; i < weight.Value; i++)
+            {
+                gameEvents.Add(weight.Key);
+            }
+        }
+
+        var shuffledGameEvents = gameEvents.ToList();
+        Shuffle(shuffledGameEvents);
+
+        return shuffledGameEvents.Take(3).ToList();
     }
 
     private static List<T> GetWeightedRandomGameEvents<T>(Dictionary<T, int> weights, int count)

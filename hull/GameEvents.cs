@@ -18,4 +18,5 @@ public enum GameEvents
     OneForAll,
     OpenTheNoor,
     OnAPowderKeg,
+    Custom
 }

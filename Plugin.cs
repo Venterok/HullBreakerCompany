@@ -57,7 +57,20 @@ namespace HullBreakerCompany
             ResetLevelUnits(newLevel);
             
             var n = newLevel;
+            
+            var customEventsDict = new Dictionary<GameEvents, CustomEvent>();
             var randomEvents = RandomEnumSelector.GetRandomGameEvents();
+            var customEvents = ConfigManager.GetCustomEvents();
+
+            foreach (var customEvent in customEvents)
+            {
+                for (int i = 0; i < customEvent.Weight; i++)
+                {
+                    randomEvents.Add(GameEvents.Custom);
+                    customEventsDict[GameEvents.Custom] = customEvent;
+                }
+            }
+            
             var componentRarity = new Dictionary<Type, int>();
             HUDManager.Instance.AddTextToChatOnServer("<color=red>NOTES ABOUT MOON:</color>\"");
 
@@ -141,6 +154,14 @@ namespace HullBreakerCompany
                         break;
                     case GameEvents.Nothing:
                         message = "<color=white>...</color>";
+                        break;
+                    case GameEvents.Custom:
+                        var customEvent = customEventsDict[gameEvent];
+                        message = customEvent.Message;
+                        foreach (var enemyAI in customEvent.EnemyAIs)
+                        {
+                            componentRarity.Add(Type.GetType(enemyAI), customEvent.Rarity);
+                        }
                         break;
                 }
 

@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BepInEx;
 
 namespace HullBreakerCompany.hull
@@ -34,6 +35,36 @@ namespace HullBreakerCompany.hull
                 { GameEvents.OnAPowderKeg, _configFile.Bind("Weights", "OnAPowderKeg", 1).Value }
             };
         }
+        public static List<CustomEvent> GetCustomEvents()
+        {
+            EnsureConfigExists();
+
+            var customEvents = new List<CustomEvent>();
+            var customSection = _configFile.Bind("Custom", "CustomEvents", "").Value;
+            if (!string.IsNullOrEmpty(customSection))
+            {
+                var entries = customSection.Split(',');
+                foreach (var entry in entries)
+                {
+                    var parts = entry.Split(';');
+                    var message = parts[0];
+                    var weight = int.Parse(parts[1] as string);
+                    var rarity = int.Parse(parts[2] as string);
+                    var enemyAIs = parts[3].Split(',').ToList();
+
+                    customEvents.Add(new CustomEvent
+                    {
+                        Message = message,
+                        Weight = weight,
+                        Rarity = rarity,
+                        EnemyAIs = enemyAIs
+                    });
+                }
+            }
+
+            return customEvents;
+        }
+        
 
         private static void EnsureConfigExists()
         {
